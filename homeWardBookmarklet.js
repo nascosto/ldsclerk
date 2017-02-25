@@ -25,7 +25,7 @@ javascript:(function () {
 
         memberProfileCounter--;
         if (memberProfileCounter === 0) {
-            alert(csvMembersWithParents);
+            addModal(csvMembersWithParents);
         }
     }
 
@@ -47,5 +47,14 @@ javascript:(function () {
         };
         xhr.open('GET', url);
         xhr.send();
+    }
+
+    function addModal(text) {
+        let css = 'margin: -300px 0 0 -350px; padding: 0 50px; left: 50%; top: 50%; width: 700px; height: 600px; position: fixed; z-index: 10000; box-sizing: border-box; overflow: auto; white-space: pre; color: #FFFFFF; background-color: rgba(0,0,0,0.8);';
+
+        let modal = document.createElement('div');
+        modal.style.cssText = css;
+        modal.textContent = text;
+        document.body.appendChild(modal);
     }
 }());
