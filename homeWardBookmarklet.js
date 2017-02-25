@@ -1,12 +1,22 @@
 javascript:(function () { 
     const memberListUrl = 'https://beta.lds.org/mls/mbr/services/report/member-list?lang=eng';
     const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
+    const modalCss = 'margin: -300px 0 0 -350px; padding: 0 50px; left: 50%; top: 50%; width: 700px; height: 600px; position: fixed; z-index: 10000; box-sizing: border-box; overflow: auto; white-space: pre; color: #FFFFFF; background-color: rgba(0,0,0,0.8);';
 
     let csvMembersWithParents = 'Name,Father\'s Name,Father\'s Unit,Mother\'s Name,Mother\'s Unit\n';
 
-    requestJson(memberListUrl, onGetMemberListSuccess, () => console.error('Failed to get member list.'));
-
     let memberProfileCounter;
+
+    generateHomeWardList();
+
+    function generateHomeWardList() {
+        if (window.ldsClerkModal) {
+            document.body.removeChild(window.ldsClerkModal);
+            delete window.ldsClerkModal;
+        }
+
+        requestJson(memberListUrl, onGetMemberListSuccess, () => console.error('Failed to get member list.'));
+    }
 
     function onGetMemberListSuccess(list) {
         memberProfileCounter = list.length;
@@ -50,11 +60,10 @@ javascript:(function () {
     }
 
     function addModal(text) {
-        let css = 'margin: -300px 0 0 -350px; padding: 0 50px; left: 50%; top: 50%; width: 700px; height: 600px; position: fixed; z-index: 10000; box-sizing: border-box; overflow: auto; white-space: pre; color: #FFFFFF; background-color: rgba(0,0,0,0.8);';
-
         let modal = document.createElement('div');
-        modal.style.cssText = css;
+        modal.style.cssText = modalCss;
         modal.textContent = text;
         document.body.appendChild(modal);
+        window.ldsClerkModal = modal;
     }
 }());
