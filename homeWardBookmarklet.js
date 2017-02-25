@@ -29,7 +29,7 @@ javascript:(function () {
 
         memberProfileCounter--;
         if (memberProfileCounter === 0) {
-            outputToNewWindow(csvMembersWithParents);
+            saveMembersWithParents(csvMembersWithParents);
         }
     }
 
@@ -53,9 +53,17 @@ javascript:(function () {
         xhr.send();
     }
 
-    function outputToNewWindow(text) {
-        var url = 'data:application/json;charset=utf8,' + encodeURIComponent(text);
-        window.open(url, '_blank');
-        window.focus();
+    function saveMembersWithParents(text) {
+        let blob = new Blob([text], {type: 'text/plain'});
+
+        var a = document.createElement('a');
+        a.style = 'display: none';
+        a.href = window.URL.createObjectURL(blob);
+        a.download = 'homeWard.csv';
+
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
     }
 }());
