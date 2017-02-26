@@ -2,7 +2,7 @@ javascript:(function () {
     const memberListUrl = 'https://beta.lds.org/mls/mbr/services/report/member-list?lang=eng';
     const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
 
-    let csvMembersWithParents = 'Name,Father\'s Name,Father\'s Unit,Mother\'s Name,Mother\'s Unit\n';
+    let csvMembersWithParents = 'Name,"Father\'s Name","Father\'s Unit","Mother\'s Name","Mother\'s Unit"\n';
 
     let memberProfileCounter;
 
@@ -25,7 +25,7 @@ javascript:(function () {
         let fatherUnit = member.family.parents && member.family.parents.father && member.family.parents.father.unitNumber ? member.family.parents.father.unitNumber : '';
         let motherName = member.family.parents && member.family.parents.mother && member.family.parents.mother.name ? member.family.parents.mother.name : '';
         let motherUnit = member.family.parents && member.family.parents.mother && member.family.parents.mother.unitNumber ? member.family.parents.mother.unitNumber : '';
-        csvMembersWithParents += name + ',' + fatherName + ',' + fatherUnit + ',' + motherName + ',' + motherUnit + '\n';
+        csvMembersWithParents += '"' + name + '","' + fatherName + '",' + fatherUnit + ',"' + motherName + '",' + motherUnit + '\n';
 
         memberProfileCounter--;
         if (memberProfileCounter === 0) {
