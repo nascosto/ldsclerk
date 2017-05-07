@@ -22,7 +22,7 @@ javascript:(function () {
         let moveInDate = member.moveDate;
         let individualEmail = member.email;
         let householdEmail = member.householdEmail;
-        csvNewMembers += '"' + name + '","' + moveInDate + '",' + individualEmail + ',"' + householdEmail + '\n';
+        csvNewMembers += '"' + name + '",' + moveInDate + ',' + individualEmail + ',' + householdEmail + '\n';
     }
 
     function requestJson(url, onSuccess, onError) {
