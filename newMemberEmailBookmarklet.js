@@ -1,36 +1,28 @@
 javascript:(function () { 
-    const memberListUrl = 'https://beta.lds.org/mls/mbr/services/report/member-list?lang=eng';
+    const newMemberUrl = 'https://beta.lds.org/mls/mbr/services/report/members-moved-in/unit/472050/3?lang=eng'
     const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
 
-    let csvMembersWithParents = 'Name,"Father\'s Name","Father\'s Unit","Mother\'s Name","Mother\'s Unit"\n';
+    let csvNewMembers = 'Name,"Move in Date","Individual Email","Household Email"\n';
 
-    let memberProfileCounter;
+    generateNewMemberList();
 
-    generateHomeWardList();
-
-    function generateHomeWardList() {
-        requestJson(memberListUrl, onGetMemberListSuccess, () => console.error('Failed to get member list.'));
+    function generateNewMemberList() {
+        requestJson(newMemberUrl, onGetNewMemberListSuccess, () => console.error('Failed to get new member list.'));
     }
 
-    function onGetMemberListSuccess(list) {
-        memberProfileCounter = list.length;
+    function onGetNewMemberListSuccess(list) {
         for (let i = 0; i < list.length; i++) {
-            requestJson(memberProfileUrl + list[i].id + '?lang=eng', onGetMemberProfileSuccess, () => console.error('Failed to get member profile ' + list[i].id));
+            processNewMember(list[i]);
         }
+        saveNewMembers(csvNewMembers);
     }
 
-    function onGetMemberProfileSuccess(member) {
-        let name = member.individual.name;
-        let fatherName = member.family.parents && member.family.parents.father && member.family.parents.father.name ? member.family.parents.father.name : '';
-        let fatherUnit = member.family.parents && member.family.parents.father && member.family.parents.father.unitNumber ? member.family.parents.father.unitNumber : '';
-        let motherName = member.family.parents && member.family.parents.mother && member.family.parents.mother.name ? member.family.parents.mother.name : '';
-        let motherUnit = member.family.parents && member.family.parents.mother && member.family.parents.mother.unitNumber ? member.family.parents.mother.unitNumber : '';
-        csvMembersWithParents += '"' + name + '","' + fatherName + '",' + fatherUnit + ',"' + motherName + '",' + motherUnit + '\n';
-
-        memberProfileCounter--;
-        if (memberProfileCounter === 0) {
-            saveMembersWithParents(csvMembersWithParents);
-        }
+    function processNewMember(member) {
+        let name = member.spokenName;
+        let moveInDate = member.moveDate;
+        let individualEmail = member.email;
+        let householdEmail = member.householdEmail;
+        csvNewMembers += '"' + name + '","' + moveInDate + '",' + individualEmail + ',"' + householdEmail + '\n';
     }
 
     function requestJson(url, onSuccess, onError) {
@@ -53,13 +45,13 @@ javascript:(function () {
         xhr.send();
     }
 
-    function saveMembersWithParents(text) {
+    function saveNewMembers(text) {
         let blob = new Blob([text], {type: 'text/plain'});
 
         var a = document.createElement('a');
         a.style = 'display: none';
         a.href = window.URL.createObjectURL(blob);
-        a.download = 'homeWard.csv';
+        a.download = 'newMembers.csv';
 
         document.body.appendChild(a);
         a.click();
