@@ -1,5 +1,5 @@
 javascript:(function () { 
-    const newMemberUrl = 'https://beta.lds.org/mls/mbr/services/report/members-moved-in/unit/472050/3?lang=eng'
+    const newMemberUrl = 'https://beta.lds.org/mls/mbr/services/report/members-moved-in/unit/472050/3?lang=eng';
     const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
 
     let csvNewMembers = 'Name,"Move in Date","Individual Email","Household Email"\n';
@@ -11,8 +11,8 @@ javascript:(function () {
     }
 
     function onGetNewMemberListSuccess(list) {
-        for (let i = 0; i < list.length; i++) {
-            processNewMember(list[i]);
+        for (let member of list) {
+            processNewMember(member);
         }
         saveNewMembers(csvNewMembers);
     }
