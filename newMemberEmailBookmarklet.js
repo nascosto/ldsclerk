@@ -1,6 +1,6 @@
 javascript:(function () { 
-    const newMemberUrl = 'https://beta.lds.org/mls/mbr/services/report/members-moved-in/unit/472050/3?lang=eng';
-    const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
+    const newMemberUrl = 'https://www.lds.org/mls/mbr/services/report/members-moved-in/unit/472050/3?lang=eng';
+    const memberProfileUrl = 'https://www.lds.org/mls/mbr/records/member-profile/service/';
 
     let csvNewMembers = 'Name,"Move in Date","Individual Email","Household Email"\n';
 
