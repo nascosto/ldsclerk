@@ -1,6 +1,6 @@
 javascript:(function () { 
-    const memberListUrl = 'https://beta.lds.org/mls/mbr/services/report/member-list?lang=eng';
-    const memberProfileUrl = 'https://beta.lds.org/mls/mbr/records/member-profile/service/';
+    const memberListUrl = 'https://www.lds.org/mls/mbr/services/report/member-list?lang=eng';
+    const memberProfileUrl = 'https://www.lds.org/mls/mbr/records/member-profile/service/';
 
     let csvMembersWithParents = 'Name,"Father\'s Name","Father\'s Unit","Mother\'s Name","Mother\'s Unit"\n';
 
