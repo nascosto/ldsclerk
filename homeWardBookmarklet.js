@@ -3,20 +3,24 @@ javascript: (function () {
 	const memberProfileUrl = 'https://www.lds.org/mls/mbr/records/member-profile/service/';
 	const unitDetailsUrl = 'https://www.lds.org/mls/mbr/services/cdol/details/unit/';
 
-	let csvMembersWithParents = 'Name,"Father\'s Name","Father\'s Unit","Mother\'s Name","Mother\'s Unit"\n';
+	let csvMembersWithParents = 'Name,"Father\'s Name","Father\'s Unit","Father\'s Unit Name","Mother\'s Name","Mother\'s Unit","Mother\'s Unit Name"\n';
 
 	let memberProfileCounter;
 
 	generateHomeWardList();
 
 	function generateHomeWardList() {
-		requestJson(memberListUrl, onGetMemberListSuccess, () => console.error('Failed to get member list.'));
+		requestJson(memberListUrl)
+			.then(response => onGetMemberListSuccess(response))
+			.catch(() => console.error('Failed to get member list.'));
 	}
 
 	function onGetMemberListSuccess(list) {
 		memberProfileCounter = list.length;
 		for (let i = 0; i < list.length; i++) {
-			requestJson(`${memberProfileUrl}${list[i].id}?lang=eng`, onGetMemberProfileSuccess, () => console.error('Failed to get member profile ' + list[i].id));
+			requestJson(`${memberProfileUrl}${list[i].id}?lang=eng`)
+				.then(response => onGetMemberProfileSuccess(response))
+				.catch(() => console.error(`Failed to get member profile ${list[i].id}`));
 		}
 	}
 
@@ -26,32 +30,44 @@ javascript: (function () {
 		let fatherUnit = member.family.parents && member.family.parents.father && member.family.parents.father.unitNumber ? member.family.parents.father.unitNumber : '';
 		let motherName = member.family.parents && member.family.parents.mother && member.family.parents.mother.name ? member.family.parents.mother.name : '';
 		let motherUnit = member.family.parents && member.family.parents.mother && member.family.parents.mother.unitNumber ? member.family.parents.mother.unitNumber : '';
-		csvMembersWithParents += `"${name}","${fatherName}",${fatherUnit},"${motherName}",${motherUnit}\n`;
 
-		memberProfileCounter--;
-		if (memberProfileCounter === 0) {
-			saveMembersWithParents(csvMembersWithParents);
-		}
+		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}`) : Promise.resolve({});
+		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}`) : Promise.resolve({});
+		Promise.all(fatherUnitDetailsPromise, motherUnitDetailsPromise)
+			.then(unitDetails => {
+				csvMembersWithParents +=
+					`"${name}","${fatherName}",${fatherUnit},"${unitDetails[0].title}",${motherName}",${motherUnit},"${unitDetails[1].title}"\n`;
+
+				memberProfileCounter--;
+				if (memberProfileCounter === 0) {
+					saveMembersWithParents(csvMembersWithParents);
+				}
+			})
+			.catch(() => console.error(`Failed to get parent unit details ${fatherUnit} ${motherUnit}`));
 	}
 
-	function requestJson(url, onSuccess, onError) {
-		let xhr = new XMLHttpRequest();
-		xhr.onreadystatechange = () => {
-			if (xhr.readyState === 4) {
-				if (xhr.status === 200) {
-					if (onSuccess) {
-						let response = JSON.parse(xhr.responseText);
-						onSuccess(response);
-					}
+	function requestJson(url) {
+		return new Promise((resolve, reject) => {
+			let xhr = new XMLHttpRequest();
+			xhr.onload = () => {
+				if (xhr.status === 200 && xhr.status < 300) {
+					resolve(JSON.parse(xhr.response));
 				} else {
-					if (onError) {
-						onError();
-					}
+					reject({
+						status: xhr.status,
+						statusText: xhr.statusText
+					});
 				}
-			}
-		};
-		xhr.open('GET', url);
-		xhr.send();
+			};
+			xhr.onerror = () => {
+				reject({
+					status: xhr.status,
+					statusText: xhr.statusText
+				});
+			};
+			xhr.open('GET', url);
+			xhr.send();
+		});
 	}
 
 	function saveMembersWithParents(text) {
