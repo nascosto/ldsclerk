@@ -33,7 +33,7 @@ javascript: (function () {
 
 		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}`) : Promise.resolve({});
 		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}`) : Promise.resolve({});
-		Promise.all(fatherUnitDetailsPromise, motherUnitDetailsPromise)
+		Promise.all([fatherUnitDetailsPromise, motherUnitDetailsPromise])
 			.then(unitDetails => {
 				csvMembersWithParents +=
 					`"${name}","${fatherName}",${fatherUnit},"${unitDetails[0].title}",${motherName}",${motherUnit},"${unitDetails[1].title}"\n`;
