@@ -80,7 +80,8 @@ javascript: (function () {
 
 		var a = document.createElement('a');
 		a.style = 'display: none';
-		a.href = window.URL.createObjectURL(blob);
+		let url = window.URL.createObjectURL(blob);
+		a.href = url;
 		a.download = 'homeWard.csv';
 
 		document.body.appendChild(a);
