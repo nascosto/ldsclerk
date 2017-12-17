@@ -31,8 +31,8 @@ javascript: (function () {
 		let motherName = member.family.parents && member.family.parents.mother && member.family.parents.mother.name ? member.family.parents.mother.name : '';
 		let motherUnit = member.family.parents && member.family.parents.mother && member.family.parents.mother.unitNumber ? member.family.parents.mother.unitNumber : '';
 
-		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}`) : Promise.resolve({});
-		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}`) : Promise.resolve({});
+		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}?lang=eng`) : Promise.resolve({});
+		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}?lang=eng`) : Promise.resolve({});
 		Promise.all([fatherUnitDetailsPromise, motherUnitDetailsPromise])
 			.then(unitDetails => {
 				csvMembersWithParents +=
