@@ -43,7 +43,10 @@ javascript: (function () {
 					saveMembersWithParents(csvMembersWithParents);
 				}
 			})
-			.catch(() => console.error(`Failed to get parent unit details ${fatherUnit} ${motherUnit}`));
+			.catch((e) => {
+				console.error(`Failed to get parent unit details ${fatherUnit} ${motherUnit}`);
+				console.error('Error: ' + e);
+			});
 	}
 
 	function requestJson(url) {
