@@ -31,12 +31,14 @@ javascript: (function () {
 		let motherName = member.family.parents && member.family.parents.mother && member.family.parents.mother.name ? member.family.parents.mother.name : '';
 		let motherUnit = member.family.parents && member.family.parents.mother && member.family.parents.mother.unitNumber ? member.family.parents.mother.unitNumber : '';
 
-		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}?lang=eng`) : Promise.resolve({});
-		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}?lang=eng`) : Promise.resolve({});
+		let fatherUnitDetailsPromise = fatherUnit ? requestJson(`${unitDetailsUrl}${fatherUnit}?lang=eng`) : Promise.resolve(null);
+		let motherUnitDetailsPromise = motherUnit ? requestJson(`${unitDetailsUrl}${motherUnit}?lang=eng`) : Promise.resolve(null);
 		Promise.all([fatherUnitDetailsPromise, motherUnitDetailsPromise])
 			.then(unitDetails => {
+				let fatherUnitName = unitDetails[0] ? unitDetails[0].title : '';
+				let motherUnitName = unitDetails[1] ? unitDetails[1].title : '';
 				csvMembersWithParents +=
-					`"${name}","${fatherName}",${fatherUnit},"${unitDetails[0].title}",${motherName}",${motherUnit},"${unitDetails[1].title}"\n`;
+					`"${name}","${fatherName}",${fatherUnit},"${fatherUnitName}",${motherName}",${motherUnit},"${motherUnitName}"\n`;
 
 				memberProfileCounter--;
 				if (memberProfileCounter === 0) {
