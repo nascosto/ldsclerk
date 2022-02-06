@@ -12,8 +12,12 @@ javascript:(function () {
         'Primary': 'Bishop',
         'Relief Society': 'Bishop',
         'Stake Baptism Coordinator': 'Stake President',
+        'Stake Clerk': 'Stake President',
         'Stake High Councilor': 'Stake President',
         'Teachers Quorum': 'Bishopric First Counselor',
+        'Technology Specialist': 'Technology',
+        'Temple and Family History': 'Bishop',
+        'Ward Missionaries': 'Bishop',
     };
 
     let subOrgsAsMembers = [];
