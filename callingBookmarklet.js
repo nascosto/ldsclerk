@@ -2,6 +2,20 @@ javascript:(function () {
     const membersWithCallingsUrl = 'https://lcr.churchofjesuschrist.org/services/report/members-with-callings';
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
 
+    const overrides = {
+        'Auditor': 'Stake President',
+        'Bishopric': 'Stake President',
+        'Deacons Quorum': 'Bishopric Second Counselor',
+        'Elders Quorum': 'Bishop',
+        'Missionary': 'Full-Time Missionaries',
+        'Priests Quorum': 'Bishop',
+        'Primary': 'Bishop',
+        'Relief Society': 'Bishop',
+        'Stake Baptism Coordinator': 'Stake President',
+        'Stake High Councilor': 'Stake President',
+        'Teachers Quorum': 'Bishopric First Counselor',
+    };
+
     let subOrgsAsMembers = [];
 
     generateCallingsList();
@@ -22,23 +36,22 @@ javascript:(function () {
             subOrgsAsMembers = subOrgsAsMembers.concat(childrenAsMembers);
             let subOrgAsMember = {
                 id: subOrg.subOrgId,
-                name: subOrg.name,
                 organization: parent ? parent.name : subOrg.name,
                 parentSubOrgId: parent ? parent.subOrgId : null,
                 position: subOrg.name,
-                spokenName: subOrg.name,
                 subOrgId: subOrg.subOrgId,
                 supervisorId: parent ? parent.subOrgId : null,
             };
             subOrgsAsMembers.push(subOrgAsMember);
         }
-        console.info("I got here 2");
         return subOrgsAsMembers;
     }
 
     function onGetMembersWithCallingsSuccess(members) {
         setSupervisors(members);
+        uniquifyIds(members);
         members = members.concat(subOrgsAsMembers);
+        applySupervisorOverrides(members);
 
         let headers = getHeaders(members);
 
@@ -53,6 +66,29 @@ javascript:(function () {
     function setSupervisors(members) {
         for (let member of members) {
             member.supervisorId = member.subOrgId;
+        }
+    }
+
+    function applySupervisorOverrides(members) {
+        for (let member of members) {
+            let overridePosition = overrides[member.position];
+            if (overridePosition) {
+                let supervisor = members.find(m => m.position === overridePosition);
+                if (supervisor) {
+                    member.supervisorId = supervisor.id;
+                }
+            }
+        }
+    }
+
+    function uniquifyIds (members) {
+        for (let i = 0; i < members.length; i++) {
+            let ids = members.map(m => m.id);
+            let member = members[i];
+            let lastIndexOfId = ids.lastIndexOf(member.id);
+            if (lastIndexOfId >= 0 && lastIndexOfId !== i) {
+                member.id = member.id * 10;
+            }
         }
     }
 
