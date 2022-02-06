@@ -2,14 +2,45 @@ javascript:(function () {
     const membersWithCallingsUrl = 'https://lcr.churchofjesuschrist.org/services/report/members-with-callings';
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
 
+    let subOrgsAsMembers = [];
+
     generateCallingsList();
 
     function generateCallingsList() {
+        requestJson(subOrgNameHeirarchyUrl, onGetSubOrgNameHeirarchySuccess, () => console.error('Failed to get sub-org name heirarchy.'));
+    }
+
+    function onGetSubOrgNameHeirarchySuccess(subOrgs) {
+        subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
         requestJson(membersWithCallingsUrl, onGetMembersWithCallingsSuccess, () => console.error('Failed to get member calling list.'));
     }
 
+    function getSubOrgsAsMembers(subOrgs, parent) {
+        let subOrgsAsMembers = [];
+        for (let subOrg of subOrgs) {
+            let childrenAsMembers = getSubOrgsAsMembers(subOrg.children, subOrg);
+            subOrgsAsMembers = subOrgsAsMembers.concat(childrenAsMembers);
+            let subOrgAsMember = {
+                id: subOrg.subOrgId,
+                name: subOrg.name,
+                organization: parent ? parent.name : subOrg.name,
+                parentSubOrgId: parent ? parent.subOrgId : null,
+                position: subOrg.name,
+                spokenName: subOrg.name,
+                subOrgId: subOrg.subOrgId,
+                supervisorId: parent ? parent.subOrgId : null,
+            };
+            subOrgsAsMembers.push(subOrgAsMember);
+        }
+        console.info("I got here 2");
+        return subOrgsAsMembers;
+    }
+
     function onGetMembersWithCallingsSuccess(members) {
-        var headers = getHeaders(members);
+        setSupervisors(members);
+        members = members.concat(subOrgsAsMembers);
+
+        let headers = getHeaders(members);
 
         let csv = sanitize(headers).join(',') + '\n';
 
@@ -17,6 +48,12 @@ javascript:(function () {
             csv += getRow(member, headers) + '\n';
         }
         saveNewMembers(csv);
+    }
+
+    function setSupervisors(members) {
+        for (let member of members) {
+            member.supervisorId = member.subOrgId;
+        }
     }
 
     function getHeaders(members) {
