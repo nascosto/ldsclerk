@@ -3,21 +3,28 @@ javascript:(function () {
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
 
     const overrides = {
+        'Aaronic Priesthood Quorums': 'Bishop',
         'Auditor': 'Stake President',
         'Bishopric': 'Stake President',
-        'Deacons Quorum': 'Bishopric Second Counselor',
         'Elders Quorum': 'Bishop',
+        'Institute Teacher': 'Stake President',
         'Missionary': 'Full-Time Missionaries',
-        'Priests Quorum': 'Bishop',
+        'Other Callings': 'Bishop',
         'Primary': 'Bishop',
+        'Primary Activities - Boys 7 & 8': 'Primary Second Counselor',
+        'Primary Activities - Boys 9 & 10': 'Primary Second Counselor',
+        'Primary Activities - Girls 7': 'Primary Second Counselor',
+        'Primary Activities - Girls 8': 'Primary Second Counselor',
+        'Primary Activities - Girls 9 & 10': 'Primary Second Counselor',
         'Relief Society': 'Bishop',
         'Stake Baptism Coordinator': 'Stake President',
         'Stake Clerk': 'Stake President',
         'Stake High Councilor': 'Stake President',
-        'Teachers Quorum': 'Bishopric First Counselor',
+        'Sunday School': 'Bishop',
         'Technology Specialist': 'Technology',
         'Temple and Family History': 'Bishop',
         'Ward Missionaries': 'Bishop',
+        'Young Women': 'Bishop',
     };
 
     let subOrgsAsMembers = [];
