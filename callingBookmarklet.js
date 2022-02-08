@@ -133,10 +133,6 @@ javascript:(function () {
         return typeof value === 'string' || value instanceof String;
     }
 
-    function convertImageToDataURL(img) {
-
-    }
-
     function saveCSV(text) {
         let blob = new Blob([text], {type: 'text/plain'});
 
