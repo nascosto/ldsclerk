@@ -3,6 +3,24 @@ javascript:(function () {
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
     const imageUrl = 'https://lcr.churchofjesuschrist.org/services/photos/manage-photos/approved-image-individual/';
 
+    const ignoredSubOrgs = [
+        'Additional Aaronic Priesthood Quorums Callings',
+        'Additional Callings',
+        'Church Magazines',
+        'Deacons Quorum Additional Callings',
+        'For the Strength of Youth',
+        'History',
+        'Priests Quorum Additional Callings',
+        'Presidency of the Aaronic Priesthood',
+        'Single Adult',
+        'Sunbeam',
+        'Teachers Quorum Additional Callings',
+        'Young Single Adult',
+        'Young Women 12-13 Additional Callings',
+        'Young Women 14-15 Additional Callings',
+        'Young Women 16-18 Additional Callings',
+    ];
+
     const overrides = {
         'Aaronic Priesthood Quorums': 'Bishop',
         'Auditor': 'Stake President',
@@ -33,6 +51,7 @@ javascript:(function () {
     async function generateCallingsList() {
         let subOrgs = await getJson(subOrgNameHeirarchyUrl);
         let subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
+        subOrgsAsMembers = subOrgsAsMembers.filter(subOrg => !ignoredSubOrgs.includes(subOrg.position));
         let members = await getJson(membersWithCallingsUrl);
         processMembers(members, subOrgsAsMembers);
     }
