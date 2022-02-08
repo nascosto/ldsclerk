@@ -1,7 +1,7 @@
 javascript:(function () {
     const membersWithCallingsUrl = 'https://lcr.churchofjesuschrist.org/services/report/members-with-callings';
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
-    const memberCardUrl = 'https://lcr.churchofjesuschrist.org/services/member-card?includePriesthood=true&lang=eng&type=INDIVIDUAL&id=';
+    const imageUrl = 'https://lcr.churchofjesuschrist.org/services/photos/manage-photos/approved-image-individual/';
 
     const overrides = {
         'Aaronic Priesthood Quorums': 'Bishop',
@@ -30,15 +30,20 @@ javascript:(function () {
 
     generateCallingsList();
 
-    function generateCallingsList() {
-        getJson(subOrgNameHeirarchyUrl)
-            .then(subOrgs => {
-                let subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
-                getJson(membersWithCallingsUrl)
-                    .then(members => processMembers(members, subOrgsAsMembers))
-                    .catch(error => console.error('Failed to get member calling list.'));
-            })
-            .catch(error => console.error('Failed to get sub-org name heirarchy.'));
+    async function generateCallingsList() {
+        let subOrgs = await getJson(subOrgNameHeirarchyUrl);
+        let subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
+        let members = await getJson(membersWithCallingsUrl);
+        processMembers(members, subOrgsAsMembers);
+    }
+
+    async function getMemberDataUrl(member) {
+        let image = await getJson(imageUrl + member.id);
+        if (!image.image.tokenUrl.includes('nophoto.svg')) {
+            let dataUrl = await getDataURL(image.image.tokenUrl + '/MEDIUM');
+            member.dataUrl = dataUrl;
+        }
+        return member;
     }
 
     function getSubOrgsAsMembers(subOrgs, parent) {
