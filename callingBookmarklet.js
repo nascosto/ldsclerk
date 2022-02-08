@@ -1,6 +1,7 @@
 javascript:(function () {
     const membersWithCallingsUrl = 'https://lcr.churchofjesuschrist.org/services/report/members-with-callings';
     const subOrgNameHeirarchyUrl = 'https://lcr.churchofjesuschrist.org/services/orgs/sub-org-name-hierarchy';
+    const memberCardUrl = 'https://lcr.churchofjesuschrist.org/services/member-card?includePriesthood=true&lang=eng&type=INDIVIDUAL&id=';
 
     const overrides = {
         'Aaronic Priesthood Quorums': 'Bishop',
@@ -27,17 +28,17 @@ javascript:(function () {
         'Young Women': 'Bishop',
     };
 
-    let subOrgsAsMembers = [];
-
     generateCallingsList();
 
     function generateCallingsList() {
-        requestJson(subOrgNameHeirarchyUrl, onGetSubOrgNameHeirarchySuccess, () => console.error('Failed to get sub-org name heirarchy.'));
-    }
-
-    function onGetSubOrgNameHeirarchySuccess(subOrgs) {
-        subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
-        requestJson(membersWithCallingsUrl, onGetMembersWithCallingsSuccess, () => console.error('Failed to get member calling list.'));
+        getJson(subOrgNameHeirarchyUrl)
+            .then(subOrgs => {
+                let subOrgsAsMembers = getSubOrgsAsMembers(subOrgs, null);
+                getJson(membersWithCallingsUrl)
+                    .then(members => processMembers(members, subOrgsAsMembers))
+                    .catch(error => console.error('Failed to get member calling list.'));
+            })
+            .catch(error => console.error('Failed to get sub-org name heirarchy.'));
     }
 
     function getSubOrgsAsMembers(subOrgs, parent) {
@@ -58,7 +59,7 @@ javascript:(function () {
         return subOrgsAsMembers;
     }
 
-    function onGetMembersWithCallingsSuccess(members) {
+    function processMembers(members, subOrgsAsMembers) {
         setSupervisors(members);
         uniquifyIds(members);
         members = members.concat(subOrgsAsMembers);
@@ -71,7 +72,7 @@ javascript:(function () {
         for (let member of members) {
             csv += getRow(member, headers) + '\n';
         }
-        saveNewMembers(csv);
+        saveCSV(csv);
     }
 
     function setSupervisors(members) {
@@ -132,27 +133,7 @@ javascript:(function () {
         return typeof value === 'string' || value instanceof String;
     }
 
-    function requestJson(url, onSuccess, onError) {
-        let xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = () => {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    if (onSuccess) {
-                        let response = JSON.parse(xhr.responseText);
-                        onSuccess(response);
-                    }
-                } else {
-                    if (onError) {
-                        onError();
-                    }
-                }
-            }
-        };
-        xhr.open('GET', url);
-        xhr.send();
-    }
-
-    function saveNewMembers(text) {
+    function saveCSV(text) {
         let blob = new Blob([text], {type: 'text/plain'});
 
         var a = document.createElement('a');
@@ -162,7 +143,33 @@ javascript:(function () {
 
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
+    }
+
+    function getJson(url) {
+        return request({ method: 'GET', url: url }).then(data => {
+            return JSON.parse(data);
+        });
+    }
+
+    function request(obj) {
+        return new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open(obj.method || 'GET', obj.url);
+            if (obj.headers) {
+                Object.keys(obj.headers).forEach(key => {
+                    xhr.setRequestHeader(key, obj.headers[key]);
+                });
+            }
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(xhr.response);
+                } else {
+                    reject(xhr.statusText);
+                }
+            };
+            xhr.onerror = () => reject(xhr.statusText);
+            xhr.send(obj.body);
+        });
     }
 }());
