@@ -133,6 +133,10 @@ javascript:(function () {
         return typeof value === 'string' || value instanceof String;
     }
 
+    function convertImageToDataURL(img) {
+
+    }
+
     function saveCSV(text) {
         let blob = new Blob([text], {type: 'text/plain'});
 
@@ -144,6 +148,18 @@ javascript:(function () {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+    }
+
+    function getDataURL(url) {
+        return request({ method: 'GET', url: url, responseType: 'blob' }).then(data => {
+            return new Promise((resolve, reject) => {
+                let reader = new FileReader();
+                reader.onloadend = () => {
+                    resolve(reader.result);
+                };
+                reader.readAsDataURL(data);
+            });
+        });
     }
 
     function getJson(url) {
@@ -168,6 +184,9 @@ javascript:(function () {
                     reject(xhr.statusText);
                 }
             };
+            if (obj.responseType) {
+                xhr.responseType = obj.responseType;
+            }
             xhr.onerror = () => reject(xhr.statusText);
             xhr.send(obj.body);
         });
