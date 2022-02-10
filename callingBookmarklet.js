@@ -85,6 +85,8 @@ javascript:(function () {
 
     function processMembers(members, subOrgsAsMembers) {
         setSupervisors(members);
+        setNumberOfMonthsInCalling(members);
+        setHasMoreThanOneCalling(members);
         uniquifyIds(members);
         members = members.concat(subOrgsAsMembers);
         applySupervisorOverrides(members);
@@ -117,7 +119,36 @@ javascript:(function () {
         }
     }
 
-    function uniquifyIds (members) {
+    function setNumberOfMonthsInCalling(members) {
+        let now = new Date();
+        for (member of members) {
+            member.numberOfMonthsInCalling = monthDiff(new Date(member.sustainedDate), now);
+        }
+    }
+
+    function monthDiff(d1, d2) {
+        var months;
+        months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months -= d1.getMonth();
+        months += d2.getMonth();
+        return months <= 0 ? 0 : months;
+    }
+
+    function setHasMoreThanOneCalling(members) {
+        for (let i = 0; i < members.length; i++) {
+            let ids = members.map(m => m.id);
+            let member = members[i];
+            let lastIndexOfId = ids.lastIndexOf(member.id);
+            if (lastIndexOfId >= 0 && lastIndexOfId !== i) {
+                member.hasMoreThanOneCalling = true;
+                members[lastIndexOfId].hasMoreThanOneCalling = true;
+            } else if (member.hasMoreThanOneCalling === undefined) {
+                member.hasMoreThanOneCalling = false;
+            }
+        }
+    }
+
+    function uniquifyIds(members) {
         for (let i = 0; i < members.length; i++) {
             let ids = members.map(m => m.id);
             let member = members[i];
