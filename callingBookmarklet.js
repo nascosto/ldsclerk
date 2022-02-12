@@ -192,6 +192,7 @@ javascript:(function () {
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
+        delete a;
     }
 
     function getDataURL(url) {
