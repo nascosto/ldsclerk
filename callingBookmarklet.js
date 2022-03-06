@@ -11,6 +11,7 @@ javascript:(function () {
         'For the Strength of Youth',
         'History',
         'Priests Quorum Additional Callings',
+        'Primary Presidency',
         'Presidency of the Aaronic Priesthood',
         'Single Adult',
         'Sunbeam',
@@ -29,12 +30,6 @@ javascript:(function () {
         'Institute Teacher': 'Stake President',
         'Missionary': 'Full-Time Missionaries',
         'Other Callings': 'Bishopric First Counselor',
-        'Primary': 'Bishopric Second Counselor',
-        'Primary Activities - Boys 7 & 8': 'Primary Second Counselor',
-        'Primary Activities - Boys 9 & 10': 'Primary Second Counselor',
-        'Primary Activities - Girls 7': 'Primary Second Counselor',
-        'Primary Activities - Girls 8': 'Primary Second Counselor',
-        'Primary Activities - Girls 9 & 10': 'Primary Second Counselor',
         'Relief Society': 'Bishop',
         'Stake Baptism Coordinator': 'Stake President',
         'Stake Clerk': 'Stake President',
@@ -44,6 +39,32 @@ javascript:(function () {
         'Temple and Family History': 'Elders Quorum President',
         'Ward Missionaries': 'Relief Society President',
         'Young Women': 'Bishop',
+        'Ward Assistant Clerk--Finance': 'Ward Clerk',
+
+        'Primary': 'Bishopric Second Counselor',
+        'Primary President': 'Primary',
+        'Primary First Counselor': 'Primary President',
+        'Primary Second Counselor': 'Primary President',
+        'Primary Secretary': 'Primary President',
+        'Nursery': 'Primary Secretary',
+        'Sunbeam': 'Primary Secretary',
+        'Sunbeam & CTR 4': 'Primary Secretary',
+        'CTR 4': 'Primary Secretary',
+        'CTR 5': 'Primary Secretary',
+        'CTR 6': 'Primary Secretary',
+        'CTR 7': 'Primary Secretary',
+        'Valiant 8': 'Primary First Counselor',
+        'Valiant 8 & 9': 'Primary First Counselor',
+        'Valiant 9': 'Primary First Counselor',
+        'Valiant 10 A': 'Primary First Counselor',
+        'Valiant 10 B': 'Primary First Counselor',
+        'Primary Activities - Boys 7 & 8': 'Primary Second Counselor',
+        'Primary Activities - Boys 9 & 10': 'Primary Second Counselor',
+        'Primary Activities - Girls 7': 'Primary Second Counselor',
+        'Primary Activities - Girls 8': 'Primary Second Counselor',
+        'Primary Activities - Girls 9 & 10': 'Primary Second Counselor',
+        'Primary Music': 'Primary President',
+        'Primary Unassigned Teachers': 'Primary President',
     };
 
     generateCallingsList();
@@ -93,6 +114,9 @@ javascript:(function () {
 
         let headers = getHeaders(members);
 
+        members.sort(sortBy('name'));
+        members.sort(sortBy('position'));
+
         let csv = sanitize(headers).join(',') + '\n';
 
         for (let member of members) {
@@ -109,7 +133,7 @@ javascript:(function () {
 
     function applySupervisorOverrides(members) {
         for (let member of members) {
-            let overridePosition = overrides[member.position];
+            let overridePosition = overrides[member.organization + " " + member.position] || overrides[member.position];
             if (overridePosition) {
                 let supervisor = members.find(m => m.position === overridePosition);
                 if (supervisor) {
@@ -121,7 +145,7 @@ javascript:(function () {
 
     function setNumberOfMonthsInCalling(members) {
         let now = new Date();
-        for (member of members) {
+        for (let member of members) {
             member.numberOfMonthsInCalling = monthDiff(new Date(member.sustainedDate), now);
         }
     }
@@ -135,7 +159,7 @@ javascript:(function () {
     }
 
     function setNumberOfCallings(members) {
-        for (member of members) {
+        for (let member of members) {
             let matches = members.filter(m => m.id === member.id);
             member.numberOfCallings = matches.length;
         }
@@ -153,10 +177,7 @@ javascript:(function () {
     }
 
     function getHeaders(members) {
-        if (members.length === 0) {
-            return [];
-        }
-        return Object.keys(members[0]);
+        return members.length === 0 ? [] : Object.keys(members[0]).sort();
     }
 
     function getRow(member, headers) {
@@ -175,6 +196,12 @@ javascript:(function () {
             return '"' + value + '"';
         }
         return value;
+    }
+
+    function sortBy(field) {
+        return function(a, b) {
+            return (a[field] > b[field]) - (a[field] < b[field])
+        };
     }
 
     function isString(value) {
