@@ -34,6 +34,7 @@ javascript:(function () {
         'Stake Baptism Coordinator': 'Stake President',
         'Stake Clerk': 'Stake President',
         'Stake High Councilor': 'Stake President',
+        'Stake Temple and Family History Consultant': 'Stake President',
         'Sunday School': 'Bishopric First Counselor',
         'Technology Specialist': 'Technology',
         'Temple and Family History': 'Elders Quorum President',
