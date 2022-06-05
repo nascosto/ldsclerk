@@ -16,7 +16,6 @@ javascript:(function () {
         'Single Adult',
         'Sunbeam',
         'Teachers Quorum Additional Callings',
-        'Young Single Adult',
         'Young Women 12-13 Additional Callings',
         'Young Women 14-15 Additional Callings',
         'Young Women 16-18 Additional Callings',
@@ -41,6 +40,7 @@ javascript:(function () {
         'Ward Missionaries': 'Relief Society President',
         'Young Women': 'Bishop',
         'Ward Assistant Clerk--Finance': 'Ward Clerk',
+        'Ward Assistant Clerk--Membership': 'Ward Clerk',
 
         'Primary': 'Bishopric Second Counselor',
         'Primary President': 'Primary',
